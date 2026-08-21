@@ -1,2 +1,2 @@
 # projetoIA
-02f405a5454d5c631fbf8776bb0f3c9ec26e5adf
+HTTPS://marcelypassador-bit.github.io/projetoIA/

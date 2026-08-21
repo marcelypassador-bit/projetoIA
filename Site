@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Jogos</title>
+<style>
+  :root {
+    --bg: #0f1220;
+    --card: #1b1f33;
+    --accent: #6c5ce7;
+    --accent2: #00cec9;
+    --text: #f1f2f6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #0f1220, #1a1e33);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  header {
+    text-align: center;
+    padding: 40px 20px 20px;
+  }
+  header h1 {
+    font-size: 2.2rem;
+    margin: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p { color: #a4a6c0; }
+
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 20px 0 40px;
+  }
+  nav button {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid #2f3352;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: 0.2s;
+  }
+  nav button.active, nav button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  main {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .game {
+    display: none;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .game.active { display: block; }
+  .game h2 { margin-top: 0; }
+
+  /* Jogo da Velha */
+  #board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 300px;
+    margin: 20px auto;
+  }
+  #board div {
+    background: #2a2f4d;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  #board div:hover { background: #363c66; }
+
+  /* Botões gerais */
+  .btn {
+    background: var(--accent2);
+    color: #0f1220;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  .status {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-top: 10px;
+    min-height: 24px;
+  }
+
+  /* Pedra Papel Tesoura */
+  .rps-options { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+  .rps-options button {
+    font-size: 2rem;
+    background: #2a2f4d;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+  }
+  .rps-options button:hover { background: var(--accent); }
+
+  /* Adivinhação */
+  input[type=number] {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #2f3352;
+    background: #12152a;
+    color: var(--text);
+    width: 100px;
+    font-size: 1rem;
+  }
+
+  footer {
+    text-align: center;
+    color: #6c6f92;
+    padding: 20px;
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎮 Central de Jogos</h1>
+  <p>Escolha um jogo abaixo e divirta-se</p>
+</header>
+
+<nav>
+  <button data-game="velha" class="active">Jogo da Velha</button>
+  <button data-game="rps">Pedra, Papel ou Tesoura</button>
+  <button data-game="adivinha">Adivinhe o Número</button>
+</nav>
+
+<main>
+  <!-- JOGO DA VELHA -->
+  <section class="game active" id="velha">
+    <h2>❌⭕ Jogo da Velha</h2>
+    <div id="board"></div>
+    <div class="status" id="velhaStatus">Vez do jogador X</div>
+    <button class="btn" onclick="resetVelha()">Reiniciar</button>
+  </section>
+
+  <!-- PEDRA PAPEL TESOURA -->
+  <section class="game" id="rps">
+    <h2>✊✋✌️ Pedra, Papel ou Tesoura</h2>
+    <p>Escolha sua jogada:</p>
+    <div class="rps-options">
+      <button onclick="playRPS('pedra')">✊</button>
+      <button onclick="playRPS('papel')">✋</button>
+      <button onclick="playRPS('tesoura')">✌️</button>
+    </div>
+    <div class="status" id="rpsStatus">Faça sua jogada!</div>
+  </section>
+
+  <!-- ADIVINHE O NÚMERO -->
+  <section class="game" id="adivinha">
+    <h2>🔢 Adivinhe o Número</h2>
+    <p>Pensei em um número entre 1 e 100. Tente acertar!</p>
+    <input type="number" id="guessInput" min="1" max="100" placeholder="Seu palpite">
+    <button class="btn" onclick="checkGuess()">Chutar</button>
+    <div class="status" id="guessStatus"></div>
+    <button class="btn" onclick="resetGuess()">Novo jogo</button>
+  </section>
+</main>
+
+<footer>Feito com HTML, CSS e JavaScript puro — hospedado no GitHub Pages</footer>
+
+<script>
+  // Navegação entre jogos
+  document.querySelectorAll('nav button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.game').forEach(g => g.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.game).classList.add('active');
+    });
+  });
+
+  /* ---------- JOGO DA VELHA ---------- */
+  let velhaBoard = Array(9).fill('');
+  let velhaTurno = 'X';
+  let velhaFim = false;
+  const boardEl = document.getElementById('board');
+
+  function drawVelha() {
+    boardEl.innerHTML = '';
+    velhaBoard.forEach((val, i) => {
+      const cell = document.createElement('div');
+      cell.textContent = val;
+      cell.addEventListener('click', () => jogarVelha(i));
+      boardEl.appendChild(cell);
+    });
+  }
+
+  function jogarVelha(i) {
+    if (velhaBoard[i] || velhaFim) return;
+    velhaBoard[i] = velhaTurno;
+    drawVelha();
+    const vencedor = checarVencedorVelha();
+    if (vencedor) {
+      document.getElementById('velhaStatus').textContent = `🎉 Jogador ${vencedor} venceu!`;
+      velhaFim = true;
+      return;
+    }
+    if (!velhaBoard.includes('')) {
+      document.getElementById('velhaStatus').textContent = 'Empate!';
+      velhaFim = true;
+      return;
+    }
+    velhaTurno = velhaTurno === 'X' ? 'O' : 'X';
+    document.getElementById('velhaStatus').textContent = `Vez do jogador ${velhaTurno}`;
+  }
+
+  function checarVencedorVelha() {
+    const linhas = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+    for (const [a,b,c] of linhas) {
+      if (velhaBoard[a] && velhaBoard[a] === velhaBoard[b] && velhaBoard[a] === velhaBoard[c]) {
+        return velhaBoard[a];
+      }
+    }
+    return null;
+  }
+
+  function resetVelha() {
+    velhaBoard = Array(9).fill('');
+    velhaTurno = 'X';
+    velhaFim = false;
+    document.getElementById('velhaStatus').textContent = 'Vez do jogador X';
+    drawVelha();
+  }
+  drawVelha();
+
+  /* ---------- PEDRA PAPEL TESOURA ---------- */
+  function playRPS(escolha) {
+    const opcoes = ['pedra', 'papel', 'tesoura'];
+    const cpu = opcoes[Math.floor(Math.random() * 3)];
+    let resultado;
+    if (escolha === cpu) {
+      resultado = 'Empate!';
+    } else if (
+      (escolha === 'pedra' && cpu === 'tesoura') ||
+      (escolha === 'papel' && cpu === 'pedra') ||
+      (escolha === 'tesoura' && cpu === 'papel')
+    ) {
+      resultado = 'Você venceu! 🎉';
+    } else {
+      resultado = 'Você perdeu! 🤖';
+    }
+    const emoji = { pedra: '✊', papel: '✋', tesoura: '✌️' };
+    document.getElementById('rpsStatus').textContent =
+      `Você: ${emoji[escolha]}  |  Computador: ${emoji[cpu]}  →  ${resultado}`;
+  }
+
+  /* ---------- ADIVINHE O NÚMERO ---------- */
+  let numeroSecreto = Math.floor(Math.random() * 100) + 1;
+  let tentativas = 0;
+
+  function checkGuess() {
+    const palpite = parseInt(document.getElementById('guessInput').value);
+    const status = document.getElementById('guessStatus');
+    if (isNaN(palpite)) {
+      status.textContent = 'Digite um número válido!';
+      return;
+    }
+    tentativas++;
+    if (palpite === numeroSecreto) {
+      status.textContent = `🎉 Acertou em ${tentativas} tentativa(s)! Era o ${numeroSecreto}.`;
+    } else if (palpite < numeroSecreto) {
+      status.textContent = 'Mais alto! ⬆️';
+    } else {
+      status.textContent = 'Mais baixo! ⬇️';
+    }
+  }
+
+  function resetGuess() {
+    numeroSecreto = Math.floor(Math.random() * 100) + 1;
+    tentativas = 0;
+    document.getElementById('guessInput').value = '';
+    document.getElementById('guessStatus').textContent = 'Novo número sorteado. Boa sorte!';
+  }
+</script>
+
+</body>
+</html>

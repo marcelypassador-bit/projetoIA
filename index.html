@@ -1,17 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site de filmes</title>
+<meta charset="UTF-8">
+<title>Meus Jogos</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #eee;
+    text-align: center;
+    padding: 20px;
+  }
+  h1 {
+    color: #333;
+  }
+  button {
+    padding: 8px 16px;
+    margin: 5px;
+    font-size: 16px;
+  }
+  #board {
+    display: grid;
+    grid-template-columns: 60px 60px 60px;
+    grid-gap: 5px;
+    justify-content: center;
+    margin: 20px auto;
+  }
+  #board div {
+    background-color: white;
+    border: 2px solid #333;
+    font-size: 30px;
+    height: 60px;
+    line-height: 60px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
-   <h1>AluraFlix</h1>
-<p>
-Site de filmes <strong>ONLINE</strong> totalmente <em>legalizado</em>
-e nada duvidoso.
-</p>
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/FDNNHh7TRN0?si=5ytOwhqqeBekkdq3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-    <body>
-    <html>
+<h1>Meus Jogos</h1>
+<p>Trabalho de programação - HTML, CSS e JavaScript</p>
+
+<hr>
+
+<h2>Jogo da Velha</h2>
+<div id="board"></div>
+<p id="status">Vez do X</p>
+<button onclick="resetJogo()">Reiniciar</button>
+
+<hr>
+
+<h2>Pedra, Papel ou Tesoura</h2>
+<button onclick="jogarRPS('pedra')">Pedra</button>
+<button onclick="jogarRPS('papel')">Papel</button>
+<button onclick="jogarRPS('tesoura')">Tesoura</button>
+<p id="resultadoRPS"></p>
+
+<hr>
+
+<h2>Adivinhe o Número (1 a 100)</h2>
+<input type="number" id="palpite">
+<button onclick="chutar()">Chutar</button>
+<p id="resultadoNumero"></p>
+
+<script>
+// ----- Jogo da Velha -----
+var tabuleiro = ["", "", "", "", "", "", "", "", ""];
+var jogadorAtual = "X";
+var jogoAcabou = false;
+
+function desenharTabuleiro() {
+  var board = document.getElementById("board");
+  board.innerHTML = "";
+  for (var i = 0; i < 9; i++) {
+    var celula = document.createElement("div");
+    celula.innerText = tabuleiro[i];
+    celula.onclick = (function(indice) {
+      return function() { jogar(indice); };
+    })(i);
+    board.appendChild(celula);
+  }
+}
+
+function jogar(i) {
+  if (tabuleiro[i] != "" || jogoAcabou) {
+    return;
+  }
+  tabuleiro[i] = jogadorAtual;
+  desenharTabuleiro();
+
+  if (verificarVencedor()) {
+    document.getElementById("status").innerText = "Jogador " + jogadorAtual + " venceu!";
+    jogoAcabou = true;
+    return;
+  }
+
+  if (tabuleiro.indexOf("") == -1) {
+    document.getElementById("status").innerText = "Empate!";
+    jogoAcabou = true;
+    return;
+  }
+
+  jogadorAtual = jogadorAtual == "X" ? "O" : "X";
+  document.getElementById("status").innerText = "Vez do " + jogadorAtual;
+}
+
+function verificarVencedor() {
+  var combinacoes = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  for (var i = 0; i < combinacoes.length; i++) {
+    var c = combinacoes[i];
+    if (tabuleiro[c[0]] != "" && tabuleiro[c[0]] == tabuleiro[c[1]] && tabuleiro[c[1]] == tabuleiro[c[2]]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function resetJogo() {
+  tabuleiro = ["", "", "", "", "", "", "", "", ""];
+  jogadorAtual = "X";
+  jogoAcabou = false;
+  document.getElementById("status").innerText = "Vez do X";
+  desenharTabuleiro();
+}
+
+desenharTabuleiro();
+
+// ----- Pedra, Papel ou Tesoura -----
+function jogarRPS(escolha) {
+  var opcoes = ["pedra", "papel", "tesoura"];
+  var pcEscolha = opcoes[Math.floor(Math.random() * 3)];
+  var resultado = "";
+
+  if (escolha == pcEscolha) {
+    resultado = "Empate! Ambos escolheram " + escolha;
+  } else if (
+    (escolha == "pedra" && pcEscolha == "tesoura") ||
+    (escolha == "papel" && pcEscolha == "pedra") ||
+    (escolha == "tesoura" && pcEscolha == "papel")
+  ) {
+    resultado = "Voce ganhou! PC escolheu " + pcEscolha;
+  } else {
+    resultado = "Voce perdeu! PC escolheu " + pcEscolha;
+  }
+
+  document.getElementById("resultadoRPS").innerText = resultado;
+}
+
+// ----- Adivinhe o numero -----
+var numeroSecreto = Math.floor(Math.random() * 100) + 1;
+
+function chutar() {
+  var palpite = parseInt(document.getElementById("palpite").value);
+  var resultado = document.getElementById("resultadoNumero");
+
+  if (isNaN(palpite)) {
+    resultado.innerText = "Digite um numero!";
+    return;
+  }
+
+  if (palpite == numeroSecreto) {
+    resultado.innerText = "Acertou! Era o " + numeroSecreto;
+    numeroSecreto = Math.floor(Math.random() * 100) + 1;
+  } else if (palpite < numeroSecreto) {
+    resultado.innerText = "Mais alto!";
+  } else {
+    resultado.innerText = "Mais baixo!";
+  }
+}
+</script>
+
+</body>
+</html>
